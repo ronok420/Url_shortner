@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px;
+    }
+    
+    h1 {
+        color: #333;
+    }
+    
+    p {
+        color: #666;
+    }
+    
+    a {
+        color: #007BFF;
+        text-decoration: none;
+    }
+    
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+<body>
+    <h1>Url ShortNer </h1>
+    <div>
+        <p id="idShow"></p>
+        <form  id='url' >
+            <label for="">Enter your original url</label>
+            <input type="text" name="redirectURL"  placeholder="Enter URL here" required>
+            <button type="submit">Generate</button>
+        </form>
+    </div>
+    <div>
+        <% if (locals.urls) { %>
+            <table> 
+                <thead>
+                    <th>S. no</th>
+                    <th>ShortId</th>
+                    <th>Redirect</th>
+                    <th>Clicks</th>
+
+                </thead>
+                 <tbody>
+                        <% locals.urls.forEach((url, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><%= url.shortId %></td>
+                                <td><a href="<%= url.redirectURL %>" target="_blank"><%= url.redirectURL %></a></td>
+                                <td><%= url.visitHistory.length %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+            </table>
+        <% } %>
+
+    </div>
+    <script>
+document.getElementById('url').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+    const formData = new FormData(this);
+    const redirectURL = formData.get('redirectURL');
+    console.log(formData.get('redirectURL'));
+
+    fetch('http://localhost:3000/api/urls', { // Correct route is `/api/urls`, not `/api/url`
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ redirectURL })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.shortId) {
+            const shortened = `http://localhost:3000/api/urls/${data.shortId}`;
+            console.log(data.shortId);
+            document.getElementById('idShow').innerText = `Shortened URL: ${shortened}`;
+            
+            alert(`Shortened URL: ${shortened}`);
+        } else {
+            alert('Error generating short URL');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Network error or server problem');
+    });
+});
+</script>
+
+</body>
+</html>
