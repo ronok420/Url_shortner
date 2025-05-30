@@ -33,8 +33,9 @@ async function  handleUserLogin(req, res) {
        
        const token= setUser( user); // Store the user in jwt for token
        console.log(user);
-        res.cookie('token', token);
-        res.redirect('/'); // Redirect to home page after successful login
+        // res.cookie('token', token);
+        res.json({ token }); // Send the token back to the client
+        // res.redirect('/'); // Redirect to home page after successful login
         // res.status(200).json({ message: 'Login successful', userName: user.userName });
     } catch (error) {
         console.error(error);

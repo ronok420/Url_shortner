@@ -1,28 +1,33 @@
-const { getUser } = require('../services/auth');
+const { getUser } = require("../services/auth");
 
 async function restrictToLoggedInUserOnly(req, res, next) {
-    const sessionId = req.cookies?.token;
-    const user = getUser(sessionId);
-    
-    if (!user || !sessionId) {
-        return res.redirect('/login'); // Redirect to login if user is not logged in
-    }
-    
-    req.user = user; // Attach user to request object
-    next(); // Proceed to the next middleware or route handler
-}
+  const authHeader = req.headers["authorization"];
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.redirect("/login"); // No token or invalid format
+  }
 
-async function checkAuth(req, res, next) {
-  const sessionId = req.cookies?.token;
+  const token = authHeader.split("Bearer ")[1];
+  const user = getUser(token);
 
-  const user = getUser(sessionId);
+  if (!user) {
+    return res.redirect("/login");
+  }
 
   req.user = user;
   next();
 }
 
+async function checkAuth(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.split("Bearer ")[1];
+    const user = getUser(token);
+    req.user = user;
+  }
+  next();
+}
 
 module.exports = {
-    restrictToLoggedInUserOnly,
-    checkAuth
+  restrictToLoggedInUserOnly,
+  checkAuth,
 };
