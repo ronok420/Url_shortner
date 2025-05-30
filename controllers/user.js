@@ -30,9 +30,10 @@ async function  handleUserLogin(req, res) {
         if (!user) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
-        const sessionId = uuidv4(); // Generate a unique session ID
-        setUser(sessionId, user); // Store the user in the session
-        res.cookie('sessionId', sessionId);
+       
+       const token= setUser( user); // Store the user in jwt for token
+       console.log(user);
+        res.cookie('token', token);
         res.redirect('/'); // Redirect to home page after successful login
         // res.status(200).json({ message: 'Login successful', userName: user.userName });
     } catch (error) {

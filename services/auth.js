@@ -1,12 +1,26 @@
-const sessionIdToUserMap = new Map();
+const jwt = require('jsonwebtoken');
+const secretKey = "askldfjlkjdfg"; // Replace with your actual secret key
 
-function setUser(id, user) {
-  sessionIdToUserMap.set(id, user);
+function setUser( user) {
+const playload = {
+    _id: user._id,
+    email: user.email,
+  };
+  const token = jwt.sign(playload, secretKey, { expiresIn: '12h' });
+  
+  
+  // Return the token
+  return token;
 }
 
-function getUser(id) {
-    console.log("getUser id  to  show through map",sessionIdToUserMap.get(id))
-  return sessionIdToUserMap.get(id);
+function getUser(token) {
+
+try{
+    return jwt.verify(token, secretKey);
+}
+catch(error){
+return null;
+}
 }
 
 module.exports = {
