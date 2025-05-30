@@ -6,7 +6,7 @@ const UrlRoutes = require('./routes/url');
 const staticRoute = require('./routes/staticRoute');
 const userRoutes = require('./routes/user');
 const { connectToDatabase } = require('./dbConnect/connection');
-const { restrictToLoggedInUserOnly, checkAuth } = require('./middlewares/auth');
+const {  checkForAuthenticaiton ,restrictTo} = require('./middlewares/auth');
 
 
 const app = express();
@@ -16,17 +16,18 @@ app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: false })); // Parse URL-encoded request bodies
 app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(cookieparser()); // Parse cookies
+app.use(checkForAuthenticaiton)
 
 connectToDatabase(); // Connect to MongoDB
 app.set('view engine', 'ejs'); // Set EJS as the view engine
 app.set('views', path.resolve("./views")); // Set the views directory
 
 // Basic route
-app.use('/api/urls', restrictToLoggedInUserOnly, UrlRoutes);
-app.use('/',checkAuth, staticRoute);
+app.use('/api/urls', restrictTo(["NORMAL"]), UrlRoutes);
+app.use('/', staticRoute);
 app.use('/user', userRoutes);
 
-// Error handling middleware
+// Error handling middlewareQ
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });

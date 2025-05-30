@@ -5,6 +5,7 @@ function setUser( user) {
 const playload = {
     _id: user._id,
     email: user.email,
+    role:user.role
   };
   const token = jwt.sign(playload, secretKey, { expiresIn: '12h' });
   
